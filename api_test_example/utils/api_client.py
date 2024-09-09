@@ -16,7 +16,7 @@ class ApiClient:
     def login(self, username: str, password: str) -> None:
         payload = {"username": f"{username}", "password": f"{password}"}
 
-        resp = self.session.post(url=f"{self.url}/auth/login", data=json.dumps(payload))
+        resp = self.session.post(url=f"{self.url}/login", data=json.dumps(payload))
         if resp.status_code != 201:
             raise ValueError(f"Failed to login to {self.url} using {username} and {password}")
         access_token = resp.json()["access_token"]
@@ -26,6 +26,6 @@ class ApiClient:
         self.set_token(access_token=access_token)
 
     def logout(self) -> None:
-        resp = self.session.post(url=f"{self.url}/auth/logout")
+        resp = self.session.post(url=f"{self.url}/logout")
         if resp.status_code != 204:
             raise ValueError("Failed to logout")
