@@ -13,7 +13,7 @@ class Resource1_Info(ResourceInfoBase):
         return self.name
 
 
-class Resource1Agent(AgentBase[Resource1_Info]):  # pylint: disable=too-many-public-methods
+class Resource1Agnt(AgentBase[Resource1_Info]):  # pylint: disable=too-many-public-methods
     RESOURCE_NAME = "resource1"
     RESOURCE_TYPE = Resource1_Info
 
