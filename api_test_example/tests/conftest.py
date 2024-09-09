@@ -6,9 +6,9 @@ from typing import Iterator
 
 import pytest
 
-from api_test_example.lib.data_gens.base import DataGen
+from api_test_example.library.data_gens.base import DataGen
 from api_test_example.utils.api_client import ApiClient
-from api_test_example.lib.resource_agnt.resource_agnt import ResourceAgent
+from api_test_example.library.resource_agnt.resource_agnt import ResourceAgent
 from api_test_example.utils.cons import (
     ADMIN_USER,
     TEST_USER,

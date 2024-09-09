@@ -3,8 +3,8 @@ from typing import Iterator
 
 import pytest
 
-from api_test_example.lib.resource_agnt.resource_1_agnt import Resource1Agent
-from api_test_example.lib.resource_agnt.resource_agnt import ResourceAgent
+from api_test_example.library.resource_agnt.resource_1_agnt import Resource1Agent
+from api_test_example.library.resource_agnt.resource_agnt import ResourceAgent
 
 
 @pytest.fixture(name="resource_agent", scope="function")

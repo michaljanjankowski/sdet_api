@@ -1,6 +1,6 @@
 from http import HTTPStatus
-from api_test_example.lib.data_gens.base import DataGen
-from api_test_example.lib.resource_agnt.resource_agnt import ResourceAgent
+from api_test_example.library.data_gens.base import DataGen
+from api_test_example.library.resource_agnt.resource_agnt import ResourceAgent
 
 
 def test_resource1_create_one(
