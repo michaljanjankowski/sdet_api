@@ -1,31 +1,43 @@
-
-import json
-from typing import Any, Dict, List, Optional, Tuple, Union
-from .cons import PROXY_URL, SERVER_PORT, SERVER_URL
+from typing import Any
 
 import requests
 
+
 class ApiClient:
-    def __init__(
-        self,
-        url: str = f"http://{SERVER_URL}:{SERVER_PORT}/api/v1",
-    ) -> None:
-        self.url = url
-        self.session = requests.Session()
+    def __init__(self, url: str, timeout: float = 5.0, session: requests.Session | None = None) -> None:
+        self.url = url.rstrip("/")
+        self.timeout = timeout
+        self.session = session or requests.Session()
+
+    def request(self, method: str, path: str, **kwargs: Any) -> requests.Response:
+        return self.session.request(
+            method, f"{self.url}/{path.lstrip('/')}", timeout=self.timeout, **kwargs
+        )
 
     def login(self, username: str, password: str) -> None:
-        payload = {"username": f"{username}", "password": f"{password}"}
+        response = self.request("POST", "login", json={"username": username, "password": password})
+        response.raise_for_status()
+        self.set_token(response.json()["access_token"])
 
-        resp = self.session.post(url=f"{self.url}/login", data=json.dumps(payload))
-        if resp.status_code != 201:
-            raise ValueError(f"Failed to login to {self.url} using {username} and {password}")
-        access_token = resp.json()["access_token"]
-        if not access_token:
-            raise KeyError(f"Access token was not returned in resp {resp}")
-
-        self.set_token(access_token=access_token)
+    def set_token(self, access_token: str) -> None:
+        self.session.headers["Authorization"] = f"Bearer {access_token}"
 
     def logout(self) -> None:
-        resp = self.session.post(url=f"{self.url}/logout")
-        if resp.status_code != 204:
-            raise ValueError("Failed to logout")
+        response = self.request("POST", "logout")
+        response.raise_for_status()
+        self.session.headers.pop("Authorization", None)
+
+    def get(self, path: str, params: dict[str, Any] | None = None) -> requests.Response:
+        return self.request("GET", path, params=params)
+
+    def post(self, path: str, json_data: dict[str, Any]) -> requests.Response:
+        return self.request("POST", path, json=json_data)
+
+    def put(self, path: str, json_data: dict[str, Any]) -> requests.Response:
+        return self.request("PUT", path, json=json_data)
+
+    def delete(self, path: str) -> requests.Response:
+        return self.request("DELETE", path)
+
+    def close_session(self) -> None:
+        self.session.close()

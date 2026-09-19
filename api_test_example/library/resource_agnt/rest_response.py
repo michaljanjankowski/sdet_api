@@ -1,19 +1,23 @@
-
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 
-Response_T = TypeVar("Response_T")
+ResponseT = TypeVar("ResponseT", bound=BaseModel)
 
 
 class ErrorResponse(BaseModel):
-    error: Any
+    error: str
 
 
 class EmptyResponse(BaseModel):
-    ...
+    pass
 
 
-class ResponseInfo(BaseModel, Generic[Response_T]):
-    response: Union[Response_T, ErrorResponse, EmptyResponse]
+class ResponseInfo(BaseModel, Generic[ResponseT]):
+    response: ResponseT | ErrorResponse
     response_status: int
+
+    def check_status(self, expected_status: int) -> None:
+        assert self.response_status == expected_status, (
+            f"Expected HTTP {expected_status}, got {self.response_status}: {self.response}"
+        )

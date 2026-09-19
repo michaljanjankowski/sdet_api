@@ -2,7 +2,7 @@ import os
 import requests
 from dataclasses import dataclass
 from dataclass_wizard import JSONWizard
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -51,24 +51,22 @@ class AnimalResponse(JSONWizard):
     locations : List[str]
     characteristics: Characteristis
 
-class API_Service():
-    api_key = os.getenv("API_ANIMALS_KEY")
-    last_success_response = None
-    last_failed_response = None
-    calls_history = []
+class API_Service:
+    def __init__(self, api_key: str | None = None, session: requests.Session | None = None) -> None:
+        self.api_key = api_key or os.getenv("API_ANIMALS_KEY")
+        if not self.api_key:
+            raise ValueError("API_ANIMALS_KEY is required")
+        self.session = session or requests.Session()
+        self.calls_history: list[list[AnimalResponse]] = []
 
-    def get_animal(self, name):
-        api_url = 'https://api.api-ninjas.com/v1/animals?name={}'.format(name)
-        last_response = requests.get(api_url, headers={'X-Api-Key':self.api_key})
-        if last_response.status_code == requests.codes.ok:
-            self.last_success_response = AnimalResponse.from_json(last_response.text)
-            self.calls_history.append(self.last_success_response)
-        else:
-            self.last_failed_response = last_response
-            self.calls_history.append(self.last_failed_response)
-
-
-if __name__ == "__main__":
-    api_serv = API_Service()
-    api_serv.get_animal(name="cat")
-    assert  api_serv.last_success_response
+    def get_animal(self, name: str) -> list[AnimalResponse]:
+        response = self.session.get(
+            "https://api.api-ninjas.com/v1/animals",
+            params={"name": name},
+            headers={"X-Api-Key": self.api_key},
+            timeout=5,
+        )
+        response.raise_for_status()
+        animals = [AnimalResponse.from_dict(item) for item in response.json()]
+        self.calls_history.append(animals)
+        return animals
