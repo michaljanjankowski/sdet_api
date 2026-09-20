@@ -1,0 +1,72 @@
+[
+  {
+    "httpRequest": {"method": "GET", "path": "/users"},
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {"Content-Type": ["application/json"]},
+      "body": "[{\"id\":1,\"name\":\"Ada\",\"email\":\"ada@example.test\"}]"
+    }
+  },
+  {
+    "httpRequest": {"method": "GET", "path": "/users/1"},
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {"Content-Type": ["application/json"]},
+      "body": "{\"id\":1,\"name\":\"Ada\",\"email\":\"ada@example.test\"}"
+    }
+  },
+  {
+    "httpRequest": {"method": "GET", "path": "/users/999"},
+    "httpResponse": {
+      "statusCode": 404,
+      "headers": {"Content-Type": ["application/json"]},
+      "body": "{\"error\":\"User not found\"}"
+    }
+  },
+  {
+    "priority": 10,
+    "httpRequest": {
+      "method": "POST",
+      "path": "/users",
+      "body": {
+        "type": "JSON",
+        "json": {"name": "Ada", "email": "ada@example.test"}
+      }
+    },
+    "httpResponse": {
+      "statusCode": 201,
+      "headers": {"Content-Type": ["application/json"]},
+      "body": "{\"id\":2,\"name\":\"Ada\",\"email\":\"ada@example.test\"}"
+    }
+  },
+  {
+    "priority": 0,
+    "httpRequest": {"method": "POST", "path": "/users"},
+    "httpResponse": {
+      "statusCode": 400,
+      "headers": {"Content-Type": ["application/json"]},
+      "body": "{\"error\":\"Invalid user payload\"}"
+    }
+  },
+  {
+    "httpRequest": {"method": "DELETE", "path": "/users/1"},
+    "httpResponse": {"statusCode": 204}
+  },
+  {
+    "httpRequest": {"method": "GET", "path": "/slow"},
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {"Content-Type": ["application/json"]},
+      "body": "{\"status\":\"ok\"}",
+      "delay": {"timeUnit": "MILLISECONDS", "value": 1500}
+    }
+  },
+  {
+    "httpRequest": {"method": "GET", "path": "/error"},
+    "httpResponse": {
+      "statusCode": 500,
+      "headers": {"Content-Type": ["application/json"]},
+      "body": "{\"error\":\"Upstream unavailable\"}"
+    }
+  }
+]

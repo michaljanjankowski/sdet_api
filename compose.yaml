@@ -1,0 +1,21 @@
+services:
+  mockserver:
+    image: mockserver/mockserver:8.0.0
+    environment:
+      MOCKSERVER_INITIALIZATION_JSON_PATH: /config/expectations.json
+      MOCKSERVER_LOG_LEVEL: WARN
+    volumes:
+      - ./mockserver/expectations.json:/config/expectations.json:ro
+    ports:
+      - "127.0.0.1:1080:1080"
+
+  api-tests:
+    build:
+      context: .
+      dockerfile: mockserver_example/Dockerfile
+    depends_on:
+      mockserver:
+        condition: service_healthy
+    environment:
+      MOCKSERVER_URL: http://mockserver:1080
+    command: ["uv", "run", "--locked", "python", "-m", "pytest", "-q"]
